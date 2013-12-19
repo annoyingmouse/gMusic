@@ -3,7 +3,7 @@ var iconPath = "disabled.png";
 var playerTabID = 0;
 function setPlayerIcon(playerIcon){
     chrome.browserAction.setIcon({
-        path: playerIcon
+        path: "icons/" + playerIcon
     });
 }
 setPlayerIcon(iconPath);

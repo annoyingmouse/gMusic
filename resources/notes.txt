@@ -2,4 +2,4 @@
 <button data-id="play-pause" class="flat-button" title="Play"></button>
 <button data-id="play-pause" class="flat-button playing" title="Pause"></button>
 
-document.querySelectorAll('[data-id="play-pause"]')
+document.querySelectorAll('[data-id="play-pause"]')[0]
