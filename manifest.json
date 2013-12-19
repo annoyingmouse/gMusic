@@ -1,0 +1,26 @@
+{
+	"manifest_version": 2,
+	"name": "gMusic Controller",
+	"description": "This extension allows remote control of Google Play Music",
+	"version": "1.0",
+	"permissions": [
+		"management",
+		"tabs",
+		"https://play.google.com/music/listen*"
+	],
+	"browser_action": {
+		"default_icon": "disabled.png"
+	},
+	"background": {
+	    "scripts": [
+    		"popup.js"
+		],
+    	"persistent": false
+	},
+	"content_scripts": [
+	    {
+      		"matches": ["https://play.google.com/music/listen*"],
+			"js": ["myscript.js"]
+		}
+	]
+}
