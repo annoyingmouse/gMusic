@@ -2,7 +2,7 @@
 	"manifest_version": 2,
 	"name": "gMusic Controller",
 	"description": "This extension allows remote control of Google Play Music",
-	"version": "0.1",
+	"version": "0.0.0.3",
 	"permissions": [
 		"management",
 		"tabs",
