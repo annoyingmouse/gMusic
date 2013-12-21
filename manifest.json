@@ -16,7 +16,6 @@
     	"persistent": true
 	},
 	"permissions": [
-		"management",
 		"tabs",
 		"https://play.google.com/music/listen*"
 	],

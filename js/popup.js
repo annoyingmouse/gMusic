@@ -1,34 +1,33 @@
-var playerState = 0;
-var iconPath = "disabled.png";
-function setPlayerIcon(playerIcon){
+var setPlayerIcon = function(playerIcon){
+    var iconPath = [
+        "disabled.png", 
+        "pause.png", 
+        "play.png"];
     chrome.browserAction.setIcon({
-        path: "icons/" + playerIcon
+        path: "icons/" + iconPath[playerIcon]
     });
+    if(playerIcon){
+        chrome.browserAction.enable();
+    }else{
+        chrome.browserAction.disable();
+    }
 }
-setPlayerIcon(iconPath);
+var playerState = 0;
+setPlayerIcon(0);
 var port = chrome.runtime.connect({name: "gMusic"});
-chrome.runtime.onConnect.addListener(function(port) {
+var handleConnect = function(port){
+    function listener(){
+        port.postMessage({command: playerState});
+    }
     port.onMessage.addListener(function(msg) {
         playerState = msg.player;
-        switch (playerState) {
-            case 0:
-                iconPath = "disabled.png";
-                break;
-            case 1:
-                iconPath = "pause.png";
-                break;
-            case 2:
-                iconPath = "play.png";
-                break;
-        }
-        setPlayerIcon(iconPath);
+        setPlayerIcon(playerState);
     });
-    chrome.browserAction.onClicked.addListener(function(){
-        port.postMessage({command: playerState});
+    port.onDisconnect.addListener(function(port){
+        port = null;
+        setPlayerIcon(0);
+        chrome.browserAction.onClicked.removeListener(listener)
     });
-});
-
-
-
-
-
+    chrome.browserAction.onClicked.addListener(listener)
+}
+chrome.runtime.onConnect.addListener(handleConnect);
