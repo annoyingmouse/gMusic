@@ -1,8 +1,8 @@
 {
 	"name": "gMusic",
-	"version": "0.0.0.4",
+	"version": "0.0.0.8",
 	"manifest_version": 2,
-	"description": "This extension allows remote control of Google Play Music",
+	"description": "Control Google Play Music with a browser extension.",
 	"homepage_url": "https://github.com/annoyingmouse/gMusic",
 	"icons": {
     	"16": "icons/icon16.png",

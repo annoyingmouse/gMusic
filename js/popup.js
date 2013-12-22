@@ -1,6 +1,4 @@
 var setPlayerIcon = function(playerIcon){
-    // http://www.storminthecastle.com/2013/07/24/how-you-can-draw-regular-polygons-with-the-html5-canvas-api/
-    // http://smus.com/dynamic-icons-chrome-extensions/
     function polygon(ctx, x, y, radius, sides, startAngle, anticlockwise) {
         if (sides < 3) return;
         var a = (Math.PI * 2)/sides;
@@ -33,11 +31,10 @@ var setPlayerIcon = function(playerIcon){
     switch (playerIcon){
         case 0: 
                 context.beginPath();
-            polygon(context, 9.5, 9.5, 7, 3, 180*Math.PI/2);
+            polygon(context, 9.5, 9.5, 7, 3, 180 * Math.PI/2);
                 context.fillStyle = '#aaaaaa';
                 context.fill();
             break;
-
         case 1:
                 context.beginPath();
                 context.rect(5, 4, 3, 11);
@@ -47,7 +44,7 @@ var setPlayerIcon = function(playerIcon){
             break;
         case 2:
                 context.beginPath();
-                polygon(context, 9.5, 9.5, 7, 3, 180*Math.PI/2);
+            polygon(context, 9.5, 9.5, 7, 3, 180 * Math.PI/2);
                 context.fillStyle = '#333333';
                 context.fill();
             break;
@@ -60,7 +57,9 @@ var setPlayerIcon = function(playerIcon){
 }
 var playerState = 0;
 setPlayerIcon(0);
-var port = chrome.runtime.connect({name: "gMusic"});
+var port = chrome.runtime.connect({
+    name: "gMusic"
+});
 var handleConnect = function(port){
     function listener(){
         port.postMessage({command: playerState});
