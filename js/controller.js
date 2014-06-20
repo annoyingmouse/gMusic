@@ -21,7 +21,7 @@ var setPlayerIcon = function(playerIcon){
         cv.setAttribute('id', 'canvas');
         cv.setAttribute('height', '19');
         cv.setAttribute('width', '19');
-    document.body.appendChild(cv)
+    document.body.appendChild(cv);
     var canvas = document.getElementById('canvas');
     var context = canvas.getContext('2d');
         context.beginPath();
@@ -30,23 +30,23 @@ var setPlayerIcon = function(playerIcon){
         context.fill();
     switch (playerIcon){
         case 0: 
-                context.beginPath();
+            context.beginPath();
             polygon(context, 9.5, 9.5, 7, 3, 180 * Math.PI/2);
-                context.fillStyle = '#aaaaaa';
-                context.fill();
+            context.fillStyle = '#aaaaaa';
+            context.fill();
             break;
         case 1:
-                context.beginPath();
-                context.rect(5, 4, 3, 11);
-                context.rect(11, 4, 3, 11);
-                context.fillStyle = '#333333';
-                context.fill();
+            context.beginPath();
+            context.rect(5, 4, 3, 11);
+            context.rect(11, 4, 3, 11);
+            context.fillStyle = '#333333';
+            context.fill();
             break;
         case 2:
-                context.beginPath();
+            context.beginPath();
             polygon(context, 9.5, 9.5, 7, 3, 180 * Math.PI/2);
-                context.fillStyle = '#333333';
-                context.fill();
+            context.fillStyle = '#333333';
+            context.fill();
             break;
     }
     var imageData = context.getImageData(0, 0, 19, 19);

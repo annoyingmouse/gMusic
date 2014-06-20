@@ -11,7 +11,7 @@
   	},
 	"background": {
 	    "scripts": [
-    		"js/popup.js"
+    		"js/controller.js"
 		],
     	"persistent": true
 	},
@@ -25,7 +25,7 @@
 				"https://play.google.com/music/listen*"
 			],
 			"js": [
-				"js/myscript.js"
+				"js/injected.js"
 			]
 		}
 	],
