@@ -7,4 +7,4 @@ Thing is though, I do need to talk to other people sometimes and I end up losing
 
 It seems to work for me but I reckon that the whole spirit of opensource should mean that if anyone else can see an improvement then I should embrace it - thus it's hosted on <a href="https://github.com/annoyingmouse/gMusic">GitHub</a>. Please do take it and play, but please do help others by sending your enhancements back.
 
-Added it to the <a href="https://chrome.google.com/webstore/detail/gmusic/aiceljnooekdohpfkopeaojkkgebolli">Chrome store</a> and also to Opera (awaiting publication).
+Added it to the <a href="https://chrome.google.com/webstore/detail/gmusic/aiceljnooekdohpfkopeaojkkgebolli">Chrome store</a> and also to <a href="https://addons.opera.com/en/extensions/details/gmusic/">Opera Extensions</a>.
