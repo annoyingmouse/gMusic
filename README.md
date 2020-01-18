@@ -7,6 +7,6 @@ Thing is though, I do need to talk to other people sometimes and I end up losing
 
 It seems to work for me but I reckon that the whole spirit of opensource should mean that if anyone else can see an improvement then I should embrace it - thus it's hosted on [GitHub](https://github.com/annoyingmouse/gMusic). Please do take it and play, but please do help others by sending your enhancements back.
 
-Added it to the [Chrome store](https://chrome.google.com/webstore/detail/gmusic/aiceljnooekdohpfkopeaojkkgebolli) and also to [Opera Extensions](https://addons.opera.com/en/extensions/details/gmusic/).
+Added to the [Chrome store](https://chrome.google.com/webstore/detail/gmusic/aiceljnooekdohpfkopeaojkkgebolli), as an [Opera Extensions](https://addons.opera.com/en/extensions/details/gmusic/) and currently being reviewed as an Edge Extension.
 
 Altered it to work with [FireFox](https://addons.mozilla.org/en-US/firefox/addon/g_music/) - FireFox folder.
