@@ -1,16 +1,16 @@
 var port = chrome.runtime.connect({
-    name: "gMusic"
+    name: "9128Controller"
 });
 var checkExist = setInterval(function () {
-    if (document.querySelectorAll('[data-id="play-pause"]').length) {
-        var playerButton = document.querySelectorAll('[data-id="play-pause"]')[0];
+    if (document.getElementById('playButton')) {
+        var playerButton = document.getElementById('playButton')
         var observer = new WebKitMutationObserver(function (mutations) {
-            getStatus();
+            getStatus()
         });
 
-        function getStatus() {
+        function getStatus () {
             port.postMessage({
-                player: (playerButton.hasAttribute("disabled")) ? 0 : (playerButton.getAttribute("title") === "Pause") ? 1 : 2
+                player: playerButton.classList.contains('icon-playerstop') ? 1 : 2
             });
         }
 
@@ -25,4 +25,4 @@ var checkExist = setInterval(function () {
         });
         clearInterval(checkExist);
     }
-}, 100);
+}, 1000);

@@ -1,5 +1,5 @@
 var setPlayerIcon = function (playerIcon) {
-    function polygon(ctx, x, y, radius, sides, startAngle, anticlockwise) {
+    function polygon (ctx, x, y, radius, sides, startAngle, anticlockwise) {
         if (sides < 3) return;
         var a = (Math.PI * 2) / sides;
         a = anticlockwise ? -a : a;
@@ -15,7 +15,7 @@ var setPlayerIcon = function (playerIcon) {
     }
 
     var cv = document.getElementById('canvas');
-    if (cv !== null) {
+    if (cv) {
         document.body.removeChild(cv);
     }
     cv = document.createElement('canvas');
@@ -27,26 +27,26 @@ var setPlayerIcon = function (playerIcon) {
     var context = canvas.getContext('2d');
     context.beginPath();
     context.arc(9.5, 9.5, 9.5, 0, 2 * Math.PI, false);
-    context.fillStyle = '#f6f6f6';
+    context.fillStyle = '#fff8e6';
     context.fill();
     switch (playerIcon) {
         case 0:
             context.beginPath();
             polygon(context, 9.5, 9.5, 7, 3, 180 * Math.PI / 2);
-            context.fillStyle = '#aaaaaa';
+            context.fillStyle = '#fff8e6';
             context.fill();
             break;
         case 1:
             context.beginPath();
             context.rect(5, 4, 3, 11);
             context.rect(11, 4, 3, 11);
-            context.fillStyle = '#333333';
+            context.fillStyle = '#00d4c3';
             context.fill();
             break;
         case 2:
             context.beginPath();
             polygon(context, 9.5, 9.5, 7, 3, 180 * Math.PI / 2);
-            context.fillStyle = '#333333';
+            context.fillStyle = '#00d4c3';
             context.fill();
             break;
     }
@@ -54,16 +54,15 @@ var setPlayerIcon = function (playerIcon) {
     chrome.browserAction.setIcon({
         imageData: imageData
     });
-    //(playerIcon) ? chrome.browserAction.enable() : chrome.browserAction.disable();
 };
 var playerState = 0;
 setPlayerIcon(0);
 var port = chrome.runtime.connect({
-    name: "gMusic"
+    name: "9128Controller"
 });
 var handleConnect = function (port) {
-    function listener() {
-        port.postMessage({command: playerState});
+    function listener () {
+        port.postMessage({ command: playerState });
     }
 
     port.onMessage.addListener(function (msg) {

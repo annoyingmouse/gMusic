@@ -1,28 +1,28 @@
 {
-	"name": "gMusic",
+	"name": "9128Controller",
 	"version": "0.0.0.8",
 	"manifest_version": 2,
-	"description": "Control Google Play Music with a browser extension.",
-	"homepage_url": "https://github.com/annoyingmouse/gMusic",
+	"description": "Control 9128 Live with a browser extension.",
+	"homepage_url": "https://github.com/annoyingmouse/9128Controller",
 	"icons": {
-    	"16": "icons/icon16.png",
-    	"48": "icons/icon48.png",
-    	"128": "icons/icon128.png"
-  	},
+		"16": "icons/icon16.png",
+		"48": "icons/icon48.png",
+		"128": "icons/icon128.png"
+	},
 	"background": {
-	    "scripts": [
-    		"js/controller.js"
+		"scripts": [
+			"js/controller.js"
 		],
-    	"persistent": true
+		"persistent": true
 	},
 	"permissions": [
 		"tabs",
-		"https://play.google.com/music/listen*"
+		"https://9128.live/"
 	],
 	"content_scripts": [
-	    {
-      		"matches": [
-				"https://play.google.com/music/listen*"
+		{
+			"matches": [
+				"https://9128.live/"
 			],
 			"js": [
 				"js/injected.js"
