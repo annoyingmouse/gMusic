@@ -17,16 +17,17 @@
 	},
 	"permissions": [
 		"tabs",
-		"https://9128.live/"
+		"https://embed.radio.co/player/*"
 	],
 	"content_scripts": [
 		{
 			"matches": [
-				"https://9128.live/"
+				"https://embed.radio.co/player/*"
 			],
 			"js": [
 				"js/injected.js"
-			]
+			],
+			"all_frames": true
 		}
 	],
 	"browser_action": {
