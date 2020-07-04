@@ -1,28 +1,19 @@
-var port = chrome.runtime.connect({
-    name: "gMusic"
-});
-var checkExist = setInterval(function () {
-    if (document.querySelectorAll('[data-id="play-pause"]').length) {
-        var playerButton = document.querySelectorAll('[data-id="play-pause"]')[0];
-        var observer = new WebKitMutationObserver(function (mutations) {
-            getStatus();
-        });
-
-        function getStatus() {
-            port.postMessage({
-                player: (playerButton.hasAttribute("disabled")) ? 0 : (playerButton.getAttribute("title") === "Pause") ? 1 : 2
-            });
-        }
-
+const port = chrome.runtime.connect({
+    name: 'y_Music'
+})
+const checkExist = setInterval(() => {
+    if (document.getElementById('play-pause-button').hasAttribute("title")) {
+        const playerButton = document.getElementById('play-pause-button')
+        const observer = new MutationObserver(() => port.postMessage({
+            player: (playerButton.hasAttribute("disabled")) ? 0 : (playerButton.getAttribute("title") === "Pause") ? 1 : 2
+        }))
         observer.observe(playerButton, {
             attributes: true,
             subtree: false
-        });
+        })
         port.onMessage.addListener(function (msg) {
-            if (msg.command) {
-                playerButton.click();
-            }
-        });
-        clearInterval(checkExist);
+            msg.command && playerButton.click()
+        })
+        clearInterval(checkExist)
     }
-}, 100);
+}, 100)
