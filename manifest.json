@@ -1,8 +1,8 @@
 {
-	"name": "gMusic",
+	"name": "aMusic",
 	"version": "0.0.0.8",
 	"manifest_version": 2,
-	"description": "Control Google Play Music with a browser extension.",
+	"description": "Control Amazon Music with a browser extension.",
 	"homepage_url": "https://github.com/annoyingmouse/gMusic",
 	"icons": {
     	"16": "icons/icon16.png",
@@ -17,12 +17,12 @@
 	},
 	"permissions": [
 		"tabs",
-		"https://play.google.com/music/listen*"
+		"https://music.amazon.co.uk/*"
 	],
 	"content_scripts": [
 	    {
       		"matches": [
-				"https://play.google.com/music/listen*"
+				"https://music.amazon.co.uk/*"
 			],
 			"js": [
 				"js/injected.js"

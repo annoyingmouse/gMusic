@@ -54,7 +54,6 @@ var setPlayerIcon = function (playerIcon) {
     chrome.browserAction.setIcon({
         imageData: imageData
     });
-    //(playerIcon) ? chrome.browserAction.enable() : chrome.browserAction.disable();
 };
 var playerState = 0;
 setPlayerIcon(0);

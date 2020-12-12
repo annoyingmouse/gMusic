@@ -1,28 +1,31 @@
-var port = chrome.runtime.connect({
-    name: "gMusic"
+const port = chrome.runtime.connect({
+    name: "aMusic"
 });
-var checkExist = setInterval(function () {
-    if (document.querySelectorAll('[data-id="play-pause"]').length) {
-        var playerButton = document.querySelectorAll('[data-id="play-pause"]')[0];
-        var observer = new WebKitMutationObserver(function (mutations) {
-            getStatus();
-        });
-
-        function getStatus() {
-            port.postMessage({
-                player: (playerButton.hasAttribute("disabled")) ? 0 : (playerButton.getAttribute("title") === "Pause") ? 1 : 2
+const checkExist = setInterval(function () {
+    if (document.getElementById("transport")){
+        const transport = document.getElementById("transport")
+        if (transport.querySelectorAll('music-button[size=medium]').length) {
+            const playerButton = transport.querySelector('music-button[size=medium]');
+            const observer = new WebKitMutationObserver(function (mutations) {
+                getStatus();
             });
-        }
 
-        observer.observe(playerButton, {
-            attributes: true,
-            subtree: false
-        });
-        port.onMessage.addListener(function (msg) {
-            if (msg.command) {
-                playerButton.click();
+            function getStatus() {
+                port.postMessage({
+                    player: playerButton.getAttribute("aria-label") === "Pause" ? 1 : 2
+                });
             }
-        });
-        clearInterval(checkExist);
+
+            observer.observe(playerButton, {
+                attributes: true,
+                subtree: false
+            });
+            port.onMessage.addListener(function (msg) {
+                if (msg.command) {
+                    playerButton.click();
+                }
+            });
+            clearInterval(checkExist);
+        }
     }
 }, 100);
