@@ -13,11 +13,11 @@
    height="19"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
    inkscape:export-filename="C:\Users\Dominic\Desktop\bitmap1.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90"
-   sodipodi:docname="New document 1">
+   sodipodi:docname="icons.svg">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -28,14 +28,14 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="11.2"
-     inkscape:cx="30.859134"
+     inkscape:cx="15.189491"
      inkscape:cy="13.508294"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g3794"
      showgrid="true"
      objecttolerance="20"
-     inkscape:window-width="1366"
-     inkscape:window-height="745"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1">
@@ -55,7 +55,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -64,28 +64,22 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-1033.3622)">
-    <path
-       sodipodi:type="arc"
+    <circle
        style="fill:#f6f6f6;fill-opacity:1;stroke:none"
        id="path3007"
-       sodipodi:cx="28.5"
-       sodipodi:cy="9.5"
-       sodipodi:rx="9.5"
-       sodipodi:ry="9.5"
-       d="m 38,9.5 a 9.5,9.5 0 1 1 -19,0 9.5,9.5 0 1 1 19,0 z"
-       transform="translate(0,1033.3622)" />
+       transform="translate(0,1033.3622)"
+       cx="28.5"
+       cy="9.5"
+       r="9.5" />
     <g
        id="g3794">
-      <path
+      <circle
          transform="translate(0,1033.3622)"
-         d="m 19,9.5 a 9.5,9.5 0 1 1 -19,0 9.5,9.5 0 1 1 19,0 z"
-         sodipodi:ry="9.5"
-         sodipodi:rx="9.5"
-         sodipodi:cy="9.5"
-         sodipodi:cx="9.5"
          id="path2987"
          style="fill:#f6f6f6;fill-opacity:1;stroke:none"
-         sodipodi:type="arc" />
+         cx="9.5"
+         cy="9.5"
+         r="9.5" />
       <rect
          transform="translate(0,1033.3622)"
          y="4"
@@ -93,20 +87,20 @@
          height="11"
          width="3"
          id="rect3790"
-         style="fill:#333333;fill-opacity:1;stroke:none" />
+         style="fill:#01a7e5;fill-opacity:1;stroke:none" />
       <rect
-         ry="5.5511151e-017"
+         ry="5.5511151e-17"
          transform="translate(0,1033.3622)"
          y="4"
          x="5"
          height="11"
          width="3"
          id="rect3792"
-         style="fill:#333333;fill-opacity:1;stroke:none" />
+         style="fill:#01a7e5;fill-opacity:1;stroke:none" />
     </g>
     <path
        sodipodi:type="star"
-       style="fill:#333333;fill-opacity:1;stroke:none"
+       style="fill:#01a7e5;fill-opacity:1;stroke:none"
        id="path3803"
        sodipodi:sides="3"
        sodipodi:cx="29"
@@ -121,19 +115,16 @@
        d="m 36,9 -5.25,3.031089 -5.25,3.031089 0,-6.0621782 0,-6.0621776 5.25,3.031089 z"
        transform="translate(-1.302982,1033.8622)"
        inkscape:transform-center-x="-1.75" />
-    <path
+    <circle
        transform="translate(19.036171,1033.3803)"
-       sodipodi:type="arc"
        style="fill:#f6f6f6;fill-opacity:1;stroke:none"
        id="path3007-4"
-       sodipodi:cx="28.5"
-       sodipodi:cy="9.5"
-       sodipodi:rx="9.5"
-       sodipodi:ry="9.5"
-       d="m 38,9.5 a 9.5,9.5 0 1 1 -19,0 9.5,9.5 0 1 1 19,0 z" />
+       cx="28.5"
+       cy="9.5"
+       r="9.5" />
     <path
        sodipodi:type="star"
-       style="fill:#aaaaaa;fill-opacity:1;stroke:none"
+       style="fill:#73d8fe;fill-opacity:1;stroke:none"
        id="path3803-0"
        sodipodi:sides="3"
        sodipodi:cx="29"
