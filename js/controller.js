@@ -18,20 +18,20 @@ const setPlayerIcon = (playerIcon) => {
             () => {
                 context.beginPath()
                 polygon(context, 9.5, 9.5, 7, 3, 180 * Math.PI / 2)
-                context.fillStyle = '#ff9999'
+                context.fillStyle = '#9CFFD3'
                 context.fill()
             },
             () => {
                 context.beginPath()
                 context.rect(5, 4, 3, 11)
                 context.rect(11, 4, 3, 11)
-                context.fillStyle = '#ff0000'
+                context.fillStyle = '#1DB954'
                 context.fill()
             },
             () => {
                 context.beginPath()
                 polygon(context, 9.5, 9.5, 7, 3, 180 * Math.PI / 2)
-                context.fillStyle = '#ff0000'
+                context.fillStyle = '#1DB954'
                 context.fill()
             }
         ]
@@ -60,7 +60,7 @@ const setPlayerIcon = (playerIcon) => {
 let playerState = 0
 setPlayerIcon(playerState)
 const port = chrome.runtime.connect({
-    name: "y_Music"
+    name: "s_Music"
 });
 const handleConnect = port => {
     const listener = () => port.postMessage({command: playerState})

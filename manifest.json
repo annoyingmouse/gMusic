@@ -1,8 +1,8 @@
 {
-	"name": "y_Music",
+	"name": "s_Music",
 	"version": "0.0.0.8",
 	"manifest_version": 2,
-	"description": "Control YouTube Music with a browser extension.",
+	"description": "Control Spotify with a browser extension.",
 	"homepage_url": "https://github.com/annoyingmouse/gMusic",
 	"icons": {
 		"16": "icons/icon16.png",
@@ -17,12 +17,12 @@
 	},
 	"permissions": [
 		"tabs",
-		"https://music.youtube.com/*"
+		"https://open.spotify.com/*"
 	],
 	"content_scripts": [
 		{
 			"matches": [
-				"https://music.youtube.com/*"
+				"https://open.spotify.com/*"
 			],
 			"js": [
 				"js/injected.js"
