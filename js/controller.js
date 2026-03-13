@@ -6,34 +6,31 @@ import { setPlayerIcon } from './utils.js'
 //   2 = stopped
 //   3 = no 9128 Live tab open
 
-// Reads the last known player state from session storage.
+// Reads the last known player state and track title from session storage.
 // Defaults to 3 (no tab) if nothing has been saved yet.
 const getSessionData = async () => {
-  const { playerState = 3 } = await chrome.storage.session.get('playerState')
-  return { playerState }
+  const { playerState = 3, title = '' } = await chrome.storage.session.get(['playerState', 'title'])
+  return { playerState, title }
 }
 
-// Persists player state to session storage so it survives
+// Persists player state and track title to session storage so it survives
 // service worker restarts within the same browser session.
-const saveSessionData = (playerState) =>
-  chrome.storage.session.set({ playerState })
+const saveSessionData = (playerState, title) =>
+  chrome.storage.session.set({ playerState, title })
 
 // Updates the toolbar icon tooltip based on the current state.
-const updateTitle = (state) => {
-  const titles = {
-    0: 'Not playing',
-    1: 'Playing',
-    2: 'Stopped',
-    3: '9128 Live is not open'
-  }
-  chrome.action.setTitle({ title: titles[state] ?? '9128 Live is not open' })
+const updateTitle = (state, title) => {
+  const text = state === 3
+    ? '9128 Live is not open'
+    : state === 1 && title ? title : state === 1 ? 'Playing' : state === 2 ? 'Stopped' : 'Not playing'
+  chrome.action.setTitle({ title: text })
 }
 
 // Sets the icon and tooltip to the "no tab" state.
 const setNoTabState = () => {
-  saveSessionData(3)
+  saveSessionData(3, '')
   setPlayerIcon(3)
-  updateTitle(3)
+  updateTitle(3, '')
 }
 
 // Programmatically injects the content script into a tab that was already
@@ -49,9 +46,10 @@ const injectScript = id => {
 // player button changes. Updates the icon, tooltip, and persists the state.
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.state !== undefined) {
-    saveSessionData(message.state)
-    setPlayerIcon(message.state)
-    updateTitle(message.state)
+    const { state, title } = message
+    saveSessionData(state, title)
+    setPlayerIcon(state)
+    updateTitle(state, title)
     sendResponse({ received: true })
   }
 })
@@ -91,9 +89,9 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
     return
   }
 
-  const { playerState } = await getSessionData()
+  const { playerState, title } = await getSessionData()
   setPlayerIcon(playerState)
-  updateTitle(playerState)
+  updateTitle(playerState, title)
 
   try {
     const message = await chrome.tabs.sendMessage(tab.id, { text: 'are_you_there_content_script?' })

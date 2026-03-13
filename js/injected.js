@@ -1,19 +1,25 @@
-// Sends the current player state to the service worker.
+// Sends the current player state and track title to the service worker.
 // Wrapped in try/catch because the worker may not be awake yet.
-const sendMessage = async (state) => {
+const sendMessage = async (state, title) => {
   try {
-    const response = await chrome.runtime.sendMessage({ state })
+    const response = await chrome.runtime.sendMessage({ state, title })
     console.log(response)
   } catch (e) {
     // Service worker may not be ready yet
   }
 }
 
-// Derives a numeric state from the play button's current CSS classes:
-//   1 = playing  (the stop icon is shown, meaning playback is active)
-//   2 = stopped  (the play icon is shown)
-const getPlayerState = (btn) =>
-  btn.classList.contains('icon-playerstop') ? 1 : 2
+// Derives a numeric state by checking whether the player container has the
+// .playing class, which the radio.co player adds/removes on playback change.
+//   1 = playing
+//   2 = stopped
+const getPlayerState = () => document.querySelector('.player.playing') ? 1 : 2
+
+// Reads the current track name from the player.
+const getTrackTitle = () => {
+  const el = document.querySelector('.track-name')
+  return el ? el.textContent.trim() : ''
+}
 
 // Handle messages from the service worker.
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -30,22 +36,25 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 })
 
-// The player renders asynchronously, so poll until the play button exists,
-// then set up a MutationObserver to report state changes for the session.
+// The player renders asynchronously, so poll until the player container and
+// button exist, then observe the container for .playing class changes.
 const checkExist = setInterval(() => {
+  const playerEl = document.querySelector('.player')
   const playerButton = document.getElementById('playButton')
 
-  if (playerButton) {
-    // Send the initial state as soon as the button is ready.
-    sendMessage(getPlayerState(playerButton))
+  if (playerEl && playerButton) {
+    // Send the initial state as soon as the player is ready.
+    sendMessage(getPlayerState(), getTrackTitle())
 
-    // Watch for class changes on the button and report the new state.
+    // Watch for class changes on the player container (.playing added/removed)
+    // and for text changes in the track name element.
     const observer = new MutationObserver(() => {
-      sendMessage(getPlayerState(playerButton))
+      sendMessage(getPlayerState(), getTrackTitle())
     })
-    observer.observe(playerButton, {
+    observer.observe(playerEl, {
       attributes: true,
-      subtree: false
+      attributeFilter: ['class'],
+      subtree: true
     })
 
     clearInterval(checkExist)
