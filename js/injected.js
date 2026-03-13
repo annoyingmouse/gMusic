@@ -9,11 +9,11 @@ const sendMessage = async (state, title) => {
   }
 }
 
-// Derives a numeric state by checking whether the player container has the
-// .playing class, which the radio.co player adds/removes on playback change.
+// Derives a numeric state by checking whether any element has the .playing
+// class — the radio.co player adds this to an ancestor on playback start.
 //   1 = playing
 //   2 = stopped
-const getPlayerState = () => document.querySelector('.player.playing') ? 1 : 2
+const getPlayerState = () => document.querySelector('.playing') ? 1 : 2
 
 // Reads the current track name from the player.
 const getTrackTitle = () => {
