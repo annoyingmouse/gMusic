@@ -15,7 +15,6 @@ local.properties
 .classpath
 .settings/
 .loadpath
-/node_modules
 
 # External tool builders
 .externalToolBuilders/
@@ -216,4 +215,3 @@ pip-log.txt
 .mr.developer.cfg
 
 /.idea
-node_modules
