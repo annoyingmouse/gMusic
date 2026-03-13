@@ -27,6 +27,7 @@
     "storage"
   ],
   "host_permissions": [
+    "https://9128.live/*",
     "https://embed.radio.co/player/*"
   ],
   "content_scripts": [

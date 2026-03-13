@@ -57,7 +57,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 // When the user clicks the extension icon, find the player tab and
 // send it a command to toggle play/stop. Only send if the player is active.
 chrome.action.onClicked.addListener(async () => {
-  const [tab] = await chrome.tabs.query({ url: 'https://embed.radio.co/player/*' })
+  const [tab] = await chrome.tabs.query({ url: 'https://9128.live/*' })
   if (!tab) return
   const { playerState } = await getSessionData()
   if (playerState === 1 || playerState === 2) {
@@ -67,14 +67,14 @@ chrome.action.onClicked.addListener(async () => {
 
 // When any tab is closed, check whether a player tab is still open.
 chrome.tabs.onRemoved.addListener(async () => {
-  const [tab] = await chrome.tabs.query({ url: 'https://embed.radio.co/player/*' })
+  const [tab] = await chrome.tabs.query({ url: 'https://9128.live/*' })
   if (!tab) setNoTabState()
 })
 
 // When a tab navigates away from the player, check if any remain.
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
   if (changeInfo.url !== undefined) {
-    const [tab] = await chrome.tabs.query({ url: 'https://embed.radio.co/player/*' })
+    const [tab] = await chrome.tabs.query({ url: 'https://9128.live/*' })
     if (!tab) setNoTabState()
   }
 })
@@ -82,7 +82,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
 // On service worker startup: restore the icon and tooltip from session storage,
 // then check whether the player tab is open. Inject the content script if needed.
 ;(async () => {
-  const [tab] = await chrome.tabs.query({ url: 'https://embed.radio.co/player/*' })
+  const [tab] = await chrome.tabs.query({ url: 'https://9128.live/*' })
 
   if (!tab) {
     setNoTabState()
