@@ -28,10 +28,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     sendResponse({ status: 'yes' })
   }
   // Command to toggle play/stop (sent when the user clicks the extension icon).
+  // After clicking, wait a tick for the DOM to update then report the new state.
   if (message.command !== undefined) {
     const playerButton = document.getElementById('playButton')
     if (playerButton) {
       playerButton.click()
+      setTimeout(() => sendMessage(getPlayerState(), getTrackTitle()), 200)
     }
   }
 })
@@ -46,12 +48,12 @@ const checkExist = setInterval(() => {
     // Send the initial state as soon as the player is ready.
     sendMessage(getPlayerState(), getTrackTitle())
 
-    // Watch for class changes on the player container (.playing added/removed)
-    // and for text changes in the track name element.
+    // Watch for any class change anywhere in the page — the .playing class
+    // may be applied to an ancestor outside .player, so we observe broadly.
     const observer = new MutationObserver(() => {
       sendMessage(getPlayerState(), getTrackTitle())
     })
-    observer.observe(playerEl, {
+    observer.observe(document.body, {
       attributes: true,
       attributeFilter: ['class'],
       subtree: true
