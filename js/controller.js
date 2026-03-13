@@ -1,79 +1,110 @@
-const setPlayerIcon = (playerIcon) => {
-    const setAttributes = (el, attrs) => Object.entries(attrs).forEach(args => el.setAttribute(...args))
-    const polygon = (ctx, x, y, radius, sides, startAngle, anticlockwise) => {
-        let a = (Math.PI * 2) / sides
-        a = anticlockwise ? -a : a
-        ctx.save()
-        ctx.translate(x, y)
-        ctx.rotate(startAngle)
-        ctx.moveTo(radius, 0)
-        for (let i = 1; i < sides; i++) {
-            ctx.lineTo(radius * Math.cos(a * i), radius * Math.sin(a * i))
-        }
-        ctx.closePath()
-        ctx.restore()
-    }
-    const drawPlayerIcon = playerIcon => {
-        const icons = [
-            () => {
-                context.beginPath()
-                polygon(context, 9.5, 9.5, 7, 3, 180 * Math.PI / 2)
-                context.fillStyle = '#ff9999'
-                context.fill()
-            },
-            () => {
-                context.beginPath()
-                context.rect(5, 4, 3, 11)
-                context.rect(11, 4, 3, 11)
-                context.fillStyle = '#ff0000'
-                context.fill()
-            },
-            () => {
-                context.beginPath()
-                polygon(context, 9.5, 9.5, 7, 3, 180 * Math.PI / 2)
-                context.fillStyle = '#ff0000'
-                context.fill()
-            }
-        ]
-        icons[playerIcon]()
-    }
-    document.getElementById('canvas') && document.body.removeChild(document.getElementById('canvas'))
-    const cv = document.createElement('canvas')
-    setAttributes(cv, {
-        id: 'canvas',
-        height: 19,
-        width: 19
-    })
-    document.body.appendChild(cv)
-    const canvas = document.getElementById('canvas')
-    const context = canvas.getContext('2d')
-    context.beginPath()
-    context.arc(9.5, 9.5, 9.5, 0, 2 * Math.PI, false)
-    context.fillStyle = '#f6f6f6'
-    context.fill()
-    drawPlayerIcon(playerIcon)
-    const imageData = context.getImageData(0, 0, 19, 19)
-    chrome.browserAction.setIcon({
-        imageData
-    })
+import { setPlayerIcon } from './utils.js'
+
+// Player states:
+//   0 = tab open, no music (button disabled)
+//   1 = playing
+//   2 = paused
+//   3 = no YouTube Music tab open
+
+// Reads the last known player state and track title from session storage.
+// Defaults to 3 (no tab) and an empty string if nothing has been saved yet.
+const getSessionData = async () => {
+  const { playerState = 3, title = '' } = await chrome.storage.session.get(['playerState', 'title'])
+  return { playerState, title }
 }
-let playerState = 0
-setPlayerIcon(playerState)
-const port = chrome.runtime.connect({
-    name: "y_Music"
-});
-const handleConnect = port => {
-    const listener = () => port.postMessage({command: playerState})
-    port.onMessage.addListener(msg => {
-        playerState = msg.player
-        setPlayerIcon(playerState)
-    });
-    port.onDisconnect.addListener(port => {
-        port = null
-        playerState = 0
-        setPlayerIcon(playerState )
-        chrome.browserAction.onClicked.removeListener(listener)
-    })
-    chrome.browserAction.onClicked.addListener(listener)
+
+// Persists player state and track title to session storage so it survives
+// service worker restarts within the same browser session.
+const saveSessionData = (playerState, title) =>
+  chrome.storage.session.set({ playerState, title })
+
+// Updates the toolbar icon tooltip based on the current state.
+const updateTitle = (state, title) => {
+  const text = state === 3
+    ? 'YouTube Music is not open'
+    : (state !== 0 && title) ? title : 'No music playing'
+  chrome.action.setTitle({ title: text })
 }
-chrome.runtime.onConnect.addListener(handleConnect)
+
+// Sets the icon and tooltip to the "no tab" state and clears the saved title.
+const setNoTabState = () => {
+  saveSessionData(3, '')
+  setPlayerIcon(3)
+  updateTitle(3, '')
+}
+
+// Programmatically injects the content script into a tab that was already
+// open when the extension was installed or reloaded.
+const injectScript = id => {
+  chrome.scripting.executeScript({
+    target: { tabId: id },
+    files: ['js/injected.js']
+  })
+}
+
+// Listen for state updates pushed by the content script whenever the
+// YouTube Music play/pause button or track title changes. Updates the icon,
+// the tooltip, and persists the new state to session storage.
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.state !== undefined) {
+    const { state, title } = message
+    saveSessionData(state, title)
+    setPlayerIcon(state)
+    updateTitle(state, title)
+    sendResponse({ received: true })
+  }
+})
+
+// When the user clicks the extension icon, find the YouTube Music tab and
+// send it a command to toggle play/pause. Only send if music is actually
+// playing or paused — state 0 means the button is disabled, state 3 means
+// there is no tab, so there is nothing to control in either case.
+chrome.action.onClicked.addListener(async () => {
+  const [tab] = await chrome.tabs.query({ url: 'https://music.youtube.com/*' })
+  if (!tab) return
+  const { playerState } = await getSessionData()
+  if (playerState === 1 || playerState === 2) {
+    chrome.tabs.sendMessage(tab.id, { command: playerState })
+  }
+})
+
+// When any tab is closed, check whether a YouTube Music tab is still open.
+chrome.tabs.onRemoved.addListener(async () => {
+  const [tab] = await chrome.tabs.query({ url: 'https://music.youtube.com/*' })
+  if (!tab) setNoTabState()
+})
+
+// When a tab navigates away from YouTube Music, check if any remain.
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
+  if (changeInfo.url !== undefined) {
+    const [tab] = await chrome.tabs.query({ url: 'https://music.youtube.com/*' })
+    if (!tab) setNoTabState()
+  }
+})
+
+// On service worker startup: restore the icon and tooltip from session storage
+// so they don't reset after a worker restart, then check whether YouTube Music
+// is actually open. If the content script isn't responding (e.g. the tab was
+// open before the extension loaded), inject it.
+;(async () => {
+  const [tab] = await chrome.tabs.query({ url: 'https://music.youtube.com/*' })
+
+  if (!tab) {
+    setNoTabState()
+    return
+  }
+
+  const { playerState, title } = await getSessionData()
+  setPlayerIcon(playerState)
+  updateTitle(playerState, title)
+
+  try {
+    const message = await chrome.tabs.sendMessage(tab.id, { text: 'are_you_there_content_script?' })
+    if (message.status !== 'yes') {
+      injectScript(tab.id)
+    }
+  } catch (e) {
+    // sendMessage throws if no content script is listening — inject it now.
+    injectScript(tab.id)
+  }
+})()

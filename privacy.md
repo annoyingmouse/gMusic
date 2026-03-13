@@ -17,4 +17,4 @@ I may update this Privacy Policy from time to time - I encourage you to review i
 ## Comments and Questions
 If you have any comments or questions about this privacy policy, please contact me via Github.
 
-__Last updated: January 22, 2020__
+__Last updated: March 13, 2026__
