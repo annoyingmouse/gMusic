@@ -6,31 +6,38 @@ import { setPlayerIcon } from './utils.js'
 //   2 = stopped
 //   3 = no 9128 Live tab open
 
-// Reads the last known player state and track title from session storage.
-// Defaults to 3 (no tab) if nothing has been saved yet.
+// Reads the last known player state, track title, and first-play flag from
+// session storage. hasPlayedOnce is false until the player reports state 1
+// for the first time after a page load.
 const getSessionData = async () => {
-  const { playerState = 3, title = '' } = await chrome.storage.session.get(['playerState', 'title'])
-  return { playerState, title }
+  const { playerState = 3, title = '', hasPlayedOnce = false } =
+    await chrome.storage.session.get(['playerState', 'title', 'hasPlayedOnce'])
+  return { playerState, title, hasPlayedOnce }
 }
 
-// Persists player state and track title to session storage so it survives
-// service worker restarts within the same browser session.
 const saveSessionData = (playerState, title) =>
   chrome.storage.session.set({ playerState, title })
 
-// Updates the toolbar icon tooltip based on the current state.
-const updateTitle = (state, title) => {
+// Applies the toolbar icon and tooltip. When the player is stopped but has
+// never played since the last page load, shows a grey triangle (icon state 3)
+// and "Press play first" instead of the normal teal triangle and "Stopped".
+const applyState = (state, title, hasPlayedOnce) => {
+  const needsFirstPlay = state === 2 && !hasPlayedOnce
+  setPlayerIcon(needsFirstPlay ? 3 : state)
   const text = state === 3
     ? '9128 Live is not open'
-    : state === 1 && title ? title : state === 1 ? 'Playing' : state === 2 ? 'Stopped' : 'Not playing'
+    : state === 1 && title ? `Playing: ${title}`
+    : state === 1 ? 'Playing'
+    : needsFirstPlay ? 'Click play on 9128.live to start'
+    : state === 2 ? 'Stopped'
+    : 'Not playing'
   chrome.action.setTitle({ title: text })
 }
 
 // Sets the icon and tooltip to the "no tab" state.
 const setNoTabState = () => {
   saveSessionData(3, '')
-  setPlayerIcon(3)
-  updateTitle(3, '')
+  applyState(3, '', false)
 }
 
 // Programmatically injects the content script into a tab that was already
@@ -44,24 +51,69 @@ const injectScript = id => {
 
 // Listen for state updates pushed by the content script whenever the
 // player button changes. Updates the icon, tooltip, and persists the state.
+// Also tracks whether playback has been triggered at least once (so the icon
+// can transition from "Press play first" to "Stopped" after the first play),
+// and fires any pending command queued while the content script was loading.
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.state !== undefined) {
     const { state, title } = message
     saveSessionData(state, title)
-    setPlayerIcon(state)
-    updateTitle(state, title)
+
+    chrome.storage.session.get(['hasPlayedOnce', 'pendingCommand']).then(({ hasPlayedOnce = false, pendingCommand }) => {
+      const nowPlayed = hasPlayedOnce || state === 1
+      if (!hasPlayedOnce && state === 1) chrome.storage.session.set({ hasPlayedOnce: true })
+      applyState(state, title, nowPlayed)
+
+      if (pendingCommand !== undefined && sender.tab) {
+        chrome.storage.session.remove(['pendingCommand'])
+        chrome.tabs.sendMessage(sender.tab.id, { command: pendingCommand })
+      }
+    })
+
     sendResponse({ received: true })
   }
 })
 
-// When the user clicks the extension icon, find the player tab and
-// send it a command to toggle play/stop. Only send if the player is active.
+// When the user clicks the extension icon, attempt to play/pause via
+// executeScript (targets the embed frame directly). If the player hasn't been
+// manually started yet, the icon already shows "Press play first" — do nothing.
 chrome.action.onClicked.addListener(async () => {
   const [tab] = await chrome.tabs.query({ url: 'https://9128.live/*' })
   if (!tab) return
-  const { playerState } = await getSessionData()
-  if (playerState === 1 || playerState === 2) {
-    chrome.tabs.sendMessage(tab.id, { command: playerState })
+  const { playerState, hasPlayedOnce } = await getSessionData()
+  if (playerState !== 1 && playerState !== 2) return
+
+  const shouldPlay = playerState === 2
+
+  // Icon already communicates "Press play first" — wait for manual play.
+  if (shouldPlay && !hasPlayedOnce) return
+
+  try {
+    const results = await chrome.scripting.executeScript({
+      target: { tabId: tab.id, allFrames: true },
+      func: async (shouldPlay) => {
+        if (!location.href.includes('embed.radio.co')) return null
+        const audio = document.querySelector('audio')
+        if (!audio) return null
+        if (shouldPlay) {
+          try { await audio.play(); return true } catch (e) { return false }
+        } else {
+          audio.pause()
+          return true
+        }
+      },
+      args: [shouldPlay]
+    })
+    if (results.some(r => r.result === true)) return
+  } catch (e) {
+    // executeScript failed entirely — fall through to sendMessage
+  }
+
+  // Fall back to sendMessage (pause always works; play works after sticky activation)
+  try {
+    await chrome.tabs.sendMessage(tab.id, { command: playerState })
+  } catch (e) {
+    chrome.storage.session.set({ pendingCommand: playerState })
   }
 })
 
@@ -71,11 +123,15 @@ chrome.tabs.onRemoved.addListener(async () => {
   if (!tab) setNoTabState()
 })
 
-// When a tab navigates away from the player, check if any remain.
+// When a tab navigates, check if 9128.live is still open. When the player tab
+// itself starts loading (refresh or navigation), reset hasPlayedOnce so the
+// icon returns to "Press play first" until manual playback is triggered again.
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
-  if (changeInfo.url !== undefined) {
-    const [tab] = await chrome.tabs.query({ url: 'https://9128.live/*' })
-    if (!tab) setNoTabState()
+  if (changeInfo.url === undefined && changeInfo.status !== 'loading') return
+  const [tab] = await chrome.tabs.query({ url: 'https://9128.live/*' })
+  if (changeInfo.url !== undefined && !tab) setNoTabState()
+  if (changeInfo.status === 'loading' && tab?.id === tabId) {
+    chrome.storage.session.set({ hasPlayedOnce: false })
   }
 })
 
@@ -89,9 +145,8 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
     return
   }
 
-  const { playerState, title } = await getSessionData()
-  setPlayerIcon(playerState)
-  updateTitle(playerState, title)
+  const { playerState, title, hasPlayedOnce } = await getSessionData()
+  applyState(playerState, title, hasPlayedOnce)
 
   try {
     const message = await chrome.tabs.sendMessage(tab.id, { text: 'are_you_there_content_script?' })

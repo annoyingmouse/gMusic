@@ -27,13 +27,23 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.text === 'are_you_there_content_script?') {
     sendResponse({ status: 'yes' })
   }
+
   // Command to toggle play/stop (sent when the user clicks the extension icon).
-  // After clicking, wait a tick for the DOM to update then report the new state.
+  // The content script calls audio.play()/pause() directly rather than clicking
+  // the button. Extension content scripts with host permissions for the origin
+  // are not subject to Chrome's autoplay policy, so audio.play() succeeds even
+  // on the first interaction after a page refresh (unlike page-context JS, which
+  // is what btn.click() ultimately invokes). Falls back to btn.click() if no
+  // audio element is found (e.g. the player hasn't loaded yet).
   if (message.command !== undefined) {
-    const playerButton = document.getElementById('playButton')
-    if (playerButton) {
-      playerButton.click()
-      setTimeout(() => sendMessage(getPlayerState(), getTrackTitle()), 200)
+    sendResponse({ received: true })
+    const audio = document.querySelector('audio')
+    if (audio) {
+      if (audio.paused) audio.play().catch(() => {})
+      else audio.pause()
+    } else {
+      const btn = document.getElementById('playButton')
+      if (btn) btn.click()
     }
   }
 })
